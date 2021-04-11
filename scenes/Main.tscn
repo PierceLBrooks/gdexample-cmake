@@ -13,5 +13,4 @@ centered = false
 script = ExtResource( 3 )
 amplitude = 20.0
 speed = 3.0
-
 [connection signal="position_changed" from="Sprite" to="." method="_on_Sprite_position_changed"]
