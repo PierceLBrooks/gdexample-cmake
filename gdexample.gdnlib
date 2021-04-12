@@ -9,7 +9,7 @@ reloadable=false
 
 X11.64="res://bin/linux/libgdexample.so"
 Windows.64="res://bin/windows/libgdexample.dll"
-OSX.64="res://bin/darwin/libgdexample.dylib
+OSX.64="res://bin/darwin/libgdexample.dylib"
 Android.arm64-v8a="res://bin/android_arm64-v8a/libgdexample.so"
 Android.armeabia-v7a="res://bin/android_armeabi-v7a/libgdexample.so"
 Android.x86="res://bin/android_x86/libgdexample.so"

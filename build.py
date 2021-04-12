@@ -72,6 +72,14 @@ def unfix(root, script):
     return False
   return True
   
+def alphabetize(string):
+  alphabetization = ""
+  for i in range(len(string)):
+    character = string[i:(i+1)]
+    if (character.isalpha()):
+      alphabetization += character
+  return alphabetization
+  
 def make(build, api, system, parameters):
   cwd = os.getcwd()
   if not (os.path.isdir(build)):
@@ -89,6 +97,8 @@ def make(build, api, system, parameters):
   command.append("../..")
   command.append("--debug-trycompile")
   command.append("-DGODOT_API_JSON="+api)
+  command.append("-DGDNATIVECPP_HOST="+platform.system().lower())
+  command.append("-DGDNATIVECPP_TARGET="+system)
   for parameter in parameters:
     command.append(parameter)
   os.chdir(build)
@@ -106,7 +116,7 @@ def make(build, api, system, parameters):
 def handle(root, target, api, system, parameters):
   build = os.path.join(root, "godot-cpp-cmake", "build", system).replace("\\", "/")
   if ((target == "all") or (((system in target) or (target in system)) and ("bindings" in target))):
-    if not (make(build, api, system, parameters) == 0):
+    if not (make(build, api, alphabetize(system.replace("bindings", " ")), parameters) == 0):
       return -1
   build = os.path.join(root, "godot-cpp-cmake", "lib")
   for base, folders, files in os.walk(build):
@@ -116,7 +126,7 @@ def handle(root, target, api, system, parameters):
         if not (os.path.isfile(path)):
           shutil.copy(os.path.join(base, name), path)
   build = os.path.join(root, "build", system).replace("\\", "/")
-  if ((target == "all") or (((system in target) or (target in system)) and not ("bindings" in system))):
+  if ((target == "all") or (((system in target) or (target in system)) and not ("bindings" in target))):
     if not (make(build, api, system, parameters) == 0):
       return -2
   return 0
@@ -187,7 +197,10 @@ def run(root, target):
     name = os.path.basename(library[0])
     if not (name.startswith("lib")):
       name = "lib"+name
-    shutil.copy(library[0], os.path.join(root, "bin", library[1], name))
+    path = os.path.join(root, "bin", library[1])
+    if not (os.path.isdir(path)):
+      os.makedirs(path)
+    shutil.copy(library[0], os.path.join(path, name))
   return 0
   
 def launch(arguments):
