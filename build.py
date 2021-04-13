@@ -196,18 +196,17 @@ def run(root, target):
     if not (result == 0):
       print(str(result))
       return -6
+  androids = []
+  #androids.append("armeabi-v7a")
+  androids.append("arm64-v8a")
+  #androids.append("x86")
+  #androids.append("x86_64")
   if ((target == "all") or ("android" in target)):
     toolchain = os.path.join(ndk, "toolchains", "llvm", "prebuilt", system+"-x86_64")
-    
     if not (os.path.isdir(toolchain)):
       return -7
-    androids = []
     targets = {}
     marches = {}
-    #androids.append("armeabi-v7a")
-    androids.append("arm64-v8a")
-    #androids.append("x86")
-    #androids.append("x86_64")
     targets["armeabi-v7a"] = "arm7a-linux-androideabi"
     targets["arm64-v8a"] = "aarch64-linux-android"
     targets["x86"] = "i686-linux-android"
@@ -251,7 +250,7 @@ def run(root, target):
             break
     else:
       return -12
-  if ((target == "all") or ("android" in target)):
+  if (((target == "all") or ("android" in target)) and not (inclusion(bindings, target))):
     for android in androids:
       walk = os.path.join(root, "build", "android_"+android)
       if (os.path.isdir(walk)):
