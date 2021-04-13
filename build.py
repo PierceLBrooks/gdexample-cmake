@@ -15,11 +15,14 @@ def wd():
   path = os.path.dirname(os.path.abspath(filename))
   return path
   
-def execute(command):
+def execute(command, environment):
   print(str(command))
   result = None
   try:
-    result = subprocess.check_output(command)
+    if (environment == None):
+      result = subprocess.check_output(command)
+    else:
+      result = subprocess.check_output(command, env=environment)
   except subprocess.CalledProcessError as error:
     result = None
     print(error.output.decode())
@@ -40,7 +43,7 @@ def sync(root):
   command.append("update")
   command.append("--init")
   command.append("--recursive")
-  return execute(command)
+  return execute(command, None)
   
 def replace(root, script, pattern, replacement):
   for base, folders, files in os.walk(root):
@@ -94,7 +97,7 @@ def inclusion(includes, include):
       return True
   return False
   
-def make(build, api, system, parameters, binding, toolchain):
+def make(build, api, system, parameters, binding, toolchain, environment):
   cwd = os.getcwd()
   if not (os.path.isdir(build)):
     os.makedirs(build)
@@ -119,7 +122,7 @@ def make(build, api, system, parameters, binding, toolchain):
   for parameter in parameters:
     command.append(parameter)
   os.chdir(build)
-  if not (execute(command)):
+  if not (execute(command, environment)):
     return -1
   os.chdir(cwd)
   command = []
@@ -130,12 +133,12 @@ def make(build, api, system, parameters, binding, toolchain):
     os.chdir(toolchain)
   else:
     os.chdir(build)
-  if not (execute(command)):
+  if not (execute(command, environment)):
     return -2
   os.chdir(cwd)
   return 0
   
-def handle(root, target, api, system, parameters, bindings, toolchain):
+def handle(root, target, api, system, parameters, bindings, toolchain, environment):
   name = target
   for binding in bindings:
     name = name.replace(binding, "")
@@ -143,7 +146,7 @@ def handle(root, target, api, system, parameters, bindings, toolchain):
   for binding in bindings:
     build = os.path.join(root, "godot-cpp-cmake", "build", system).replace("\\", "/")
     if ((target == "all") or (((name in system) or (system in name)) and (binding in target))):
-      result = make(build, api, system, parameters, binding, toolchain)
+      result = make(build, api, system, parameters, binding, toolchain, environment)
       if not (result == 0):
         print(str(result))
         return -1
@@ -156,7 +159,7 @@ def handle(root, target, api, system, parameters, bindings, toolchain):
           shutil.copy(os.path.join(base, name), path)
   build = os.path.join(root, "build", system).replace("\\", "/")
   if ((target == "all") or (((name in system) or (system in name)) and not (inclusion(bindings, target)))):
-    result = make(build, api, system, parameters, "", toolchain)
+    result = make(build, api, system, parameters, "", toolchain, environment)
     if not (result == 0):
       print(str(result))
       return -2
@@ -192,7 +195,7 @@ def run(root, target):
   #print(api)
   parameters = []
   if ((target == "all") or (system in target)):
-    result = handle(root, target, api, system, parameters, bindings, "")
+    result = handle(root, target, api, system, parameters, bindings, "", None)
     if not (result == 0):
       print(str(result))
       return -6
@@ -234,7 +237,36 @@ def run(root, target):
         parameters.append("-DGDNATIVECPP_ANDROID_MARCH="+marches[android])
       else:
         return -10
-      result = handle(root, target, api, "android_"+android, parameters, bindings, link)
+      environment = None
+      if (system == "windows"):
+        environment = os.environ
+        keys = environment.keys()
+        for key in keys:
+          if (key.lower() == "path"):
+            gcc = os.path.join(toolchain, "lib", "gcc", targets[android])
+            if (os.path.isdir(gcc)):
+              for base, folders, files in os.walk(gcc):
+                gcc = None
+                for name in folders:
+                  gcc = os.path.join(base, name)
+                  break
+                break
+            """
+            print(gcc)
+            if not (gcc == None):
+              gcc = os.path.join(gcc, marches[android], "thumb")
+              print(gcc)
+              if not (os.path.isdir(gcc)):
+                gcc = None
+            """
+            value = os.path.join(toolchain, targets[android], "bin")
+            if not (gcc == None):
+              value = value+os.path.pathsep+gcc
+            print(value)
+            value = value+os.path.pathsep+environment[key]
+            environment[key] = value
+            break
+      result = handle(root, target, api, "android_"+android, parameters, bindings, link, environment)
       if not (result == 0):
         print(str(result))
         return -11
