@@ -5,7 +5,9 @@ import os
 import sys
 import shutil
 import inspect
+import logging
 import platform
+import traceback
 import subprocess
 
 def wd():
@@ -18,6 +20,12 @@ def execute(command):
   result = None
   try:
     result = subprocess.check_output(command)
+  except subprocess.CalledProcessError as error:
+    result = None
+    print(error.output.decode())
+  except Exception as exception:
+    result = None
+    logging.error(traceback.format_exc())
   except:
     result = None
   if not (result == None):
@@ -72,15 +80,21 @@ def unfix(root, script):
     return False
   return True
   
-def alphabetize(string):
-  alphabetization = ""
+def clean(string):
+  result = ""
   for i in range(len(string)):
     character = string[i:(i+1)]
     if (character.isalpha()):
-      alphabetization += character
-  return alphabetization
+      result += character
+  return result
   
-def make(build, api, system, parameters):
+def inclusion(includes, include):
+  for i in range(len(includes)):
+    if (includes[i] in include):
+      return True
+  return False
+  
+def make(build, api, system, parameters, binding, toolchain):
   cwd = os.getcwd()
   if not (os.path.isdir(build)):
     os.makedirs(build)
@@ -98,7 +112,10 @@ def make(build, api, system, parameters):
   command.append("--debug-trycompile")
   command.append("-DGODOT_API_JSON="+api)
   command.append("-DGDNATIVECPP_HOST="+platform.system().lower())
-  command.append("-DGDNATIVECPP_TARGET="+system)
+  if ("android" in system):
+    command.append("-DGDNATIVECPP_TARGET=android")
+  else:
+    command.append("-DGDNATIVECPP_TARGET="+system)
   for parameter in parameters:
     command.append(parameter)
   os.chdir(build)
@@ -109,15 +126,27 @@ def make(build, api, system, parameters):
   command.append("cmake")
   command.append("--build")
   command.append(build)
+  if ("android" in system):
+    os.chdir(toolchain)
+  else:
+    os.chdir(build)
   if not (execute(command)):
     return -2
+  os.chdir(cwd)
   return 0
   
-def handle(root, target, api, system, parameters):
-  build = os.path.join(root, "godot-cpp-cmake", "build", system).replace("\\", "/")
-  if ((target == "all") or (((system in target) or (target in system)) and ("bindings" in target))):
-    if not (make(build, api, alphabetize(system.replace("bindings", " ")), parameters) == 0):
-      return -1
+def handle(root, target, api, system, parameters, bindings, toolchain):
+  name = target
+  for binding in bindings:
+    name = name.replace(binding, "")
+  name = clean(name)
+  for binding in bindings:
+    build = os.path.join(root, "godot-cpp-cmake", "build", system).replace("\\", "/")
+    if ((target == "all") or (((name in system) or (system in name)) and (binding in target))):
+      result = make(build, api, system, parameters, binding, toolchain)
+      if not (result == 0):
+        print(str(result))
+        return -1
   build = os.path.join(root, "godot-cpp-cmake", "lib")
   for base, folders, files in os.walk(build):
     if not (base == build):
@@ -126,8 +155,10 @@ def handle(root, target, api, system, parameters):
         if not (os.path.isfile(path)):
           shutil.copy(os.path.join(base, name), path)
   build = os.path.join(root, "build", system).replace("\\", "/")
-  if ((target == "all") or (((system in target) or (target in system)) and not ("bindings" in target))):
-    if not (make(build, api, system, parameters) == 0):
+  if ((target == "all") or (((name in system) or (system in name)) and not (inclusion(bindings, target)))):
+    result = make(build, api, system, parameters, "", toolchain)
+    if not (result == 0):
+      print(str(result))
       return -2
   return 0
   
@@ -135,6 +166,9 @@ def run(root, target):
   #print(target)
   system = platform.system().lower()
   json = "godot_api.json"
+  sdk = "30"
+  bindings = []
+  bindings.append("bindings")
   if not ("GODOT_HOME" in os.environ):
     return -1
   if not ("ANDROID_NDK_ROOT" in os.environ):
@@ -146,29 +180,65 @@ def run(root, target):
   if not (os.path.isdir(ndk)):
     return -4
   #print(godot)
-  command = []
-  command.append(godot)
-  command.append("--gdnative-generate-json-api")
-  command.append(json)
-  if not (execute(command)):
-    return -5
+  if ((target == "all") or (inclusion(bindings, target))):
+    command = []
+    command.append(godot)
+    command.append("--gdnative-generate-json-api")
+    command.append(json)
+    if not (execute(command)):
+      return -5
   #print(root)
   api = os.path.join(root, json).replace("\\", "/")
   #print(api)
   parameters = []
   if ((target == "all") or (system in target)):
-    if not (handle(root, target, api, system, parameters) == 0):
+    result = handle(root, target, api, system, parameters, bindings, "")
+    if not (result == 0):
+      print(str(result))
       return -6
-  androids = []
-  androids.append("arm64-v8a")
   if ((target == "all") or ("android" in target)):
+    toolchain = os.path.join(ndk, "toolchains", "llvm", "prebuilt", system+"-x86_64")
+    
+    if not (os.path.isdir(toolchain)):
+      return -7
+    androids = []
+    targets = {}
+    marches = {}
+    #androids.append("armeabi-v7a")
+    androids.append("arm64-v8a")
+    #androids.append("x86")
+    #androids.append("x86_64")
+    targets["armeabi-v7a"] = "arm7a-linux-androideabi"
+    targets["arm64-v8a"] = "aarch64-linux-android"
+    targets["x86"] = "i686-linux-android"
+    targets["x86_64"] = "x86_64-linux-android"
+    marches["armeabi-v7a"] = "armv7-a"
+    marches["arm64-v8a"] = "armv8-a"
+    marches["x86"] = "i686"
+    marches["x86_64"] = "x86-64"
     for android in androids:
+      link = os.path.join(toolchain, "sysroot", "usr", "lib", targets[android], sdk)
+      if not (os.path.isdir(link)):
+        return -8
       parameters = []
       parameters.append("-DCMAKE_SYSTEM_NAME=Android")
       parameters.append("-DANDROID_ABI="+android)
+      parameters.append("-DANDROID_PLATFORM="+sdk)
       parameters.append("-DANDROID_NDK_ROOT="+ndk)
-      if not (handle(root, target, api, "android_"+android, parameters) == 0):
-        return -7
+      parameters.append("-DGDNATIVECPP_ANDROID_TOOLCHAIN="+toolchain.replace("\\", "/"))
+      if (android in targets):
+        parameters.append("-DGDNATIVECPP_ANDROID_LINK="+link.replace("\\", "/"))
+        parameters.append("-DGDNATIVECPP_ANDROID_TARGET="+targets[android])
+      else:
+        return -9
+      if (android in marches):
+        parameters.append("-DGDNATIVECPP_ANDROID_MARCH="+marches[android])
+      else:
+        return -10
+      result = handle(root, target, api, "android_"+android, parameters, bindings, link)
+      if not (result == 0):
+        print(str(result))
+        return -11
   libraries = []
   if ((target == "all") or (system in target)):
     walk = os.path.join(root, "build", system)
@@ -180,7 +250,7 @@ def run(root, target):
             libraries.append([path, system])
             break
     else:
-      return -8
+      return -12
   if ((target == "all") or ("android" in target)):
     for android in androids:
       walk = os.path.join(root, "build", "android_"+android)
@@ -192,7 +262,7 @@ def run(root, target):
               libraries.append([path, "android_"+android])
               break
       else:
-        return -9
+        return -13
   for library in libraries:
     name = os.path.basename(library[0])
     if not (name.startswith("lib")):
@@ -206,7 +276,7 @@ def run(root, target):
 def launch(arguments):
   if (len(arguments) < 2):
     return False
-  script = arguments[0]
+  script = os.path.basename(arguments[0])
   target = arguments[1]
   root = wd()
   if not (sync(root)):
