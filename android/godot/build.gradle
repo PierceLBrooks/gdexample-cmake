@@ -1,0 +1,58 @@
+apply plugin: 'com.android.library'
+
+def ARGUMENTS = ""
+ARGUMENTS += " -DGODOT_API_JSON="+System.getProperty("godot_api_json")
+ARGUMENTS += " -DGDNATIVECPP_HOST="+System.getProperty("host")
+ARGUMENTS += " -DGDNATIVECPP_TARGET="+System.getProperty("target")
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        externalNativeBuild {
+            cmake {
+                abiFilters System.getProperty("android_architecture")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            debuggable false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            externalNativeBuild {
+                cmake {
+                    cFlags ""
+                    cppFlags ""
+                    arguments ARGUMENTS.trim().split(" ")
+                }
+            }
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            externalNativeBuild {
+                cmake {
+                    cFlags ""
+                    cppFlags ""
+                    arguments ARGUMENTS.trim().split(" ")
+                }
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path System.getProperty("cmake_path")
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.valueOf(System.getProperty("java_compatibility"))
+        targetCompatibility JavaVersion.valueOf(System.getProperty("java_compatibility"))
+    }
+}
+
+dependencies {
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+}
