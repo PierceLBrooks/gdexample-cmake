@@ -2,7 +2,6 @@
 bin/
 build/
 lib/
-android/
 
 
 # Godot-specific ignores
