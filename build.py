@@ -216,8 +216,9 @@ def run(root, target, variant):
     sdk = os.environ["ANDROID_SDK"].replace("\\", "/")
   if not ((os.path.isfile(godot)) or (os.path.isfile(godot+".exe"))):
     return -3
-  if not (os.path.isdir(ndk)):
-    return -4
+  if ((target == "all") or ("android" in target)):
+    if not (os.path.isdir(ndk)):
+      return -4
   #print(godot)
   if ((target == "all") or (inclusion(bindings, target))):
     command = []
