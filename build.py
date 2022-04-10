@@ -131,7 +131,7 @@ def make(build, api, system, parameters, binding, variant, environment):
     command.append("cmake")
     command.append("-G")
     if ("windows" in system):
-      command.append("Visual Studio 15 2017 Win64")
+      command.append("Visual Studio 17 2022")
     else:
       command.append("Unix Makefiles")
     command.append("../..")
@@ -301,7 +301,7 @@ def launch(arguments):
   target = arguments[2]
   root = wd()
   for i in range(len(variants)):
-    if (variants[i].lower() == arguments[1])):
+    if (variants[i].lower() == arguments[1]):
       variant = variants[i]
       break
   if (variant == None):
