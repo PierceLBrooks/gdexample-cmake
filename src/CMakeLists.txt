@@ -81,11 +81,15 @@ endif()
 include_directories("${SRC}" "${INC}/godot_headers" "${INC}/include" "${INC}/include/core" "${INC}/include/gen" "${INC}/godot-headers" ${GDNATIVECPP_COMPAT_INCLUDE})
 
 set(SRCS )
-list(APPEND SRCS "${SRC}/gdexample.cpp")
+list(APPEND SRCS "${SRC}/gdexample_2d.cpp")
+list(APPEND SRCS "${SRC}/gdexample_3d.cpp")
+list(APPEND SRCS "${SRC}/gdexample_camera.cpp")
 list(APPEND SRCS "${SRC}/gdlibrary.cpp")
 
 set(INCS )
-list(APPEND INCS "${SRC}/gdexample.h")
+list(APPEND INCS "${SRC}/gdexample_2d.h")
+list(APPEND INCS "${SRC}/gdexample_3d.h")
+list(APPEND INCS "${SRC}/gdexample_camera.h")
 
 add_library(gdexample SHARED ${SRCS})
 if(CMAKE_SYSTEM_NAME STREQUAL Android)

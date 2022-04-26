@@ -1,5 +1,5 @@
-#ifndef GDEXAMPLE_H
-#define GDEXAMPLE_H
+#ifndef GD_EXAMPLE_2D_H
+#define GD_EXAMPLE_2D_H
 
 #include <Godot.hpp>
 #include <Sprite.hpp>
@@ -8,8 +8,8 @@
 
 namespace godot {
 
-class GDExample : public Sprite {
-	GODOT_CLASS(GDExample, Sprite)
+class GDExample2D : public Sprite {
+	GODOT_CLASS(GDExample2D, Sprite)
 
 private:
 	float time_passed;
@@ -20,8 +20,8 @@ private:
 public:
 	static void _register_methods();
 
-	GDExample();
-	~GDExample();
+	GDExample2D();
+	~GDExample2D();
 
 	void _init(); // our initializer called by Godot
 

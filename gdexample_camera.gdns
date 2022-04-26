@@ -4,6 +4,6 @@
 
 [resource]
 
-resource_name = "gdexample"
-class_name = "GDExample"
+resource_name = "gdexample_camera"
+class_name = "GDExampleCamera"
 library = ExtResource( 1 )

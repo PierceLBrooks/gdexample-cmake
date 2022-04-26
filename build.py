@@ -309,11 +309,11 @@ def launch(arguments):
     return False
   if not (sync(root)):
     return False
-  if not (fix(root, script)):
+  if not (fix(os.path.join(root, "godot-cpp-cmake"), script)):
     return False
   result = run(root, target, variant)
   print(str(result))
-  if not (unfix(root, script)):
+  if not (unfix(os.path.join(root, "godot-cpp-cmake"), script)):
     return False
   if not (result == 0):
     return False
