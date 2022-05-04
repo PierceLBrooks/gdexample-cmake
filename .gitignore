@@ -10,6 +10,7 @@ lib/
 export.cfg
 export_presets.cfg
 godot_api.json
+extension_api.json
 
 # Imported translations (automatically generated from CSV files)
 *.translation

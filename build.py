@@ -198,7 +198,7 @@ def handle(root, target, api, system, parameters, bindings, variant, environment
 def run(root, target, variant):
   #print(target)
   system = platform.system().lower()
-  json = "godot_api.json"
+  json = "extension_api.json"
   bindings = []
   bindings.append("bindings")
   if not ("GODOT_HOME" in os.environ):
@@ -220,15 +220,15 @@ def run(root, target, variant):
     if not (os.path.isdir(ndk)):
       return -4
   #print(godot)
+  api = os.path.join(root, json).replace("\\", "/")
+  #api = os.path.join(root, "godot-cpp-cmake", "godot-cpp", "godot-headers", json).replace("\\", "/")
   if ((target == "all") or (inclusion(bindings, target))):
     command = []
     command.append(godot)
-    command.append("--gdnative-generate-json-api")
-    command.append(json)
-    if not (execute(command, None)):
+    command.append("--dump-extension-api")
+    if not (os.path.exists(api)):
       return -5
   #print(root)
-  api = os.path.join(root, json).replace("\\", "/")
   #print(api)
   parameters = []
   if ((target == "all") or (system in target)):
