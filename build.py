@@ -258,7 +258,7 @@ def run(root, target, variant):
         print(str(result))
         return -11
   libraries = []
-  if ((target == "all") or (system in target)):
+  if (((target == "all") or (system in target)) and not (inclusion(bindings, target))):
     walk = os.path.join(root, "build", system).replace("\\", "/")
     if (os.path.isdir(walk)):
       for base, folders, files in os.walk(walk):
