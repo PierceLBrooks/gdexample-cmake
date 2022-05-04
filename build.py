@@ -70,14 +70,14 @@ def replace(root, script, pattern, replacement):
   return True
   
 def fix(root, script):
-  if not (replace(root, script, "void register_signal(String name, Dictionary args = Dictionary()) {", "void register_signal_fix(String name, Dictionary args = Dictionary()) {")):
+  if not (replace(root, script, "void register_signal(String name, Dictionary args) {", "void register_signal_fix(String name, Dictionary args) {")):
     return False
   if not (replace(root, script, "register_signal<T>(name, Dictionary::make(varargs...));", "register_signal_fix<T>(name, Dictionary::make(varargs...));")):
     return False
   return True
   
 def unfix(root, script):
-  if not (replace(root, script, "void register_signal_fix(String name, Dictionary args = Dictionary()) {", "void register_signal(String name, Dictionary args = Dictionary()) {")):
+  if not (replace(root, script, "void register_signal_fix(String name, Dictionary args) {", "void register_signal(String name, Dictionary args) {")):
     return False
   if not (replace(root, script, "register_signal_fix<T>(name, Dictionary::make(varargs...));", "register_signal<T>(name, Dictionary::make(varargs...));")):
     return False
