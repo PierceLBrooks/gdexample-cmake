@@ -1,0 +1,12 @@
+[configuration]
+
+entry_symbol = "example_library_init"
+
+[libraries]
+
+linux.64.debug = "bin/linux/libgdexample-d.so"
+linux.64.release = "bin/linux/libgdexample.so"
+windows.64.debug = "bin/windows/libgdexample-d.dll"
+windows.64.release = "bin/windows/libgdexample.dll"
+macos.debug = "bin/darwin/libgdexample-d.dylib"
+macos.release = "bin/darwin/libgdexample.dylib"
