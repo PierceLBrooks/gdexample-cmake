@@ -1,3 +1,6 @@
 [submodule "godot-cpp-cmake"]
 	path = godot-cpp-cmake
 	url = https://github.com/PierceLBrooks/godot-cpp-cmake.git
+[submodule "src/recastnavigation"]
+	path = src/recastnavigation
+	url = https://github.com/recastnavigation/recastnavigation.git
