@@ -13,12 +13,14 @@ texture = ExtResource( 2 )
 centered = false
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform( 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, -3 )
 texture = ExtResource( 2 )
 script = ExtResource( 3 )
 device = 402656487
 
 [node name="CSGCylinder" type="CSGCylinder" parent="Sprite3D"]
+transform = Transform( 0.1, 0, 0, 0, 0.25, 0, 0, 0, 0.1, 0, 0, 0.5 )
 script = ExtResource( 4 )
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.39609 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8 )
