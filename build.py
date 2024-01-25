@@ -133,12 +133,16 @@ def make(build, api, system, parameters, binding, variant, environment):
     if ("windows" in system):
       command.append("Visual Studio 17 2022")
     else:
-      command.append("Unix Makefiles")
+      if ("darwin" in system):
+        command.append("Xcode")
+      else:
+        command.append("Unix Makefiles")
     command.append("../..")
     #command.append("--debug-trycompile")
     command.append("-DGODOT_API_JSON="+api)
     command.append("-DGDNATIVECPP_HOST="+platform.system().lower())
     command.append("-DGDNATIVECPP_TARGET="+system)
+    command.append("-DGDNATIVECPP_PYTHON="+sys.executable)
     command.append("-DCMAKE_BUILD_TYPE="+variant)
     for parameter in parameters:
       command.append(parameter)
@@ -321,3 +325,4 @@ def launch(arguments):
   
 if (__name__ == "__main__"):
   print(str(launch(sys.argv)))
+
