@@ -3,6 +3,8 @@
 
 #include <Godot.hpp>
 #include <Array.hpp>
+#include <thread>
+#include <mutex>
 #include <vector>
 #include <atomic>
 #include <map>
@@ -12,12 +14,6 @@
 class DetourInputGeometry;
 class RecastContext;
 class GodotDetourDebugDraw;
-
-namespace std
-{
-    class thread;
-    class mutex;
-}
 
 namespace godot
 {
