@@ -499,7 +499,7 @@ DetourNavigation::createDebugMesh(int index, bool drawCacheBounds)
     // Sanity check
     if (index > _navMeshes.size() - 1)
     {
-        ERR_PRINT(String("Index higher than number of available navMeshes: {0} {1}").format(Array::make(index, _navMeshes.size())));
+        ERR_PRINT(String("Index higher than number of available navMeshes: {0} {1}").format(Array::make(index, (int)_navMeshes.size())));
         return nullptr;
     }
 
