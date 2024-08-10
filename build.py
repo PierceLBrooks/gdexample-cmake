@@ -234,13 +234,14 @@ def run(root, target, variant):
   #print(root)
   api = os.path.join(root, "gdextension_interface.h").replace("\\", "/")
   #print(api)
-  if not (os.path.exists(api)):
-    api = os.path.join(root, "extension_api.json").replace("\\", "/")
-    if (os.path.exists(api)):
-      shutil.copy(api, os.path.join(root, json).replace("\\", "/"))
-    api = os.path.join(root, json).replace("\\", "/")
+  if (os.path.exists(api)):
+    api = os.path.join(root, "godot-cpp-cmake", "gdextension_interface.h").replace("\\", "/")
+    if not (os.path.exists(api)):
+      shutil.copy(os.path.join(root, "gdextension_interface.h").replace("\\", "/"), api)
     if not (os.path.exists(api)):
       return -5
+  else:
+    return -5
   api = os.path.join(root, json).replace("\\", "/")
   #print(api)
   if not (os.path.exists(api)):
