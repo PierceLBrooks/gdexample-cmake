@@ -12,6 +12,7 @@ export.cfg
 export_presets.cfg
 extension_api.json
 godot_api.json
+gdextension_interface.h
 
 # Imported translations (automatically generated from CSV files)
 *.translation
