@@ -223,13 +223,19 @@ def run(root, target, variant):
   if ((target == "all") or (inclusion(bindings, target))):
     command = []
     command.append(godot)
-    command.append("--gdnative-generate-json-api")
+    command.append("--dump-extension-api")
     command.append(json)
     if not (execute(command, None)):
       return -5
   #print(root)
   api = os.path.join(root, json).replace("\\", "/")
   #print(api)
+  if not (os.path.exists(api)):
+    api = os.path.join(root, "extension_api.json").replace("\\", "/")
+    if (os.path.exists(api)):
+      shutil.copy(api, os.path.join(root, json).replace("\\", "/"))
+    if not (os.path.exists(api)):
+      return -5
   parameters = []
   if ((target == "all") or (system in target)):
     result = handle(root, target, api, system, parameters, bindings, variant, None)
