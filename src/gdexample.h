@@ -5,20 +5,25 @@
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
-#include <Godot.hpp>
-#include <Node.hpp>
-#include <String.hpp>
-#include <Dictionary.hpp>
-#include <Quat.hpp>
+#include <gdextension_interface.h>
+#include <godot.hpp>
+#include <node.hpp>
+#include <string.hpp>
+#include <dictionary.hpp>
+#include <quaternion.hpp>
+#include <class_db.hpp>
+#include <os.hpp>
+#include <utility_functions.hpp>
+#include <global_constants.hpp>
 #include "threespace_api_export.h"
 
 namespace godot {
 
 class GDExample : public Node {
-	GODOT_CLASS(GDExample, Node)
+	GDCLASS(GDExample, Node)
 
 private:
-  Quat orientation;
+  Quaternion orientation;
   bool active;
   int device;
   int name;
@@ -45,8 +50,8 @@ public:
 	int get_device();
 	void set_name(int p_name);
 	int get_name();
-	void set_orientation(Quat p_orientation);
-	Quat get_orientation();
+	void set_orientation(Quaternion p_orientation);
+	Quaternion get_orientation();
 };
 
 }
